@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -5,10 +6,11 @@ public class CollisionHandller : MonoBehaviour
 {
     int currentSceneIndex;
     int nextSceneIndex;
+    [SerializeField] float levelLoadDelay = 2f;
     private void Start()
     {
         currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        nextSceneIndex = ++currentSceneIndex;
+        nextSceneIndex = currentSceneIndex + 1;
     }
     void OnCollisionEnter(Collision other)
     {
@@ -19,21 +21,30 @@ public class CollisionHandller : MonoBehaviour
                 break;
             case "Finish":
                 Debug.Log("Congrats, yo, you finished!");
-                LoadNextLevel();
-                break;
-            case "Fuel":
-                Debug.Log("You picked up fuel");
+                StartSuccessSeaquence();
                 break;
             default:
                 Debug.Log("Sorry, you brew up");
-                ReloadLevel();
+                StartCrashSeaquence();
                 break;
         }
+    }
+
+    void StartSuccessSeaquence()
+    {
+        GetComponent<Movement>().enabled = false;
+        Invoke("LoadNextLevel", levelLoadDelay);
     }
 
     void ReloadLevel()
     {
         SceneManager.LoadScene(currentSceneIndex);
+    }
+
+    void StartCrashSeaquence()
+    {
+        GetComponent<Movement>().enabled = false;
+        Invoke("ReloadLevel", levelLoadDelay);
     }
 
     void LoadNextLevel()
